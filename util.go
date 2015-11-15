@@ -1,14 +1,16 @@
 package oxford
+
 import (
-	"net/http"
-	"io"
-	"fmt"
-	"mime/multipart"
 	"bytes"
-	"os"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"strings"
 )
 
-func post(url string, bodyType string, reader io.Reader) (resp *http.Response, err error) {
+func postFile(url string, reader io.Reader, apiKey string) (resp *http.Response, err error) {
+	// TODO not worked
 	if Config.AnalyzesAge {
 		url += "analyzesAge=true"
 	}
@@ -25,24 +27,17 @@ func post(url string, bodyType string, reader io.Reader) (resp *http.Response, e
 		url += "&analyzesHeadPose=true"
 	}
 
-
 	fmt.Println(url)
 
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
 
-	part, err := writer.CreateFormFile("file", "/Users/du/Desktop/1.jpg")
+	part, err := writer.CreateFormFile("file", "1.jpg")
 	if err != nil {
 		return nil, err
 	}
 
-	file, err := os.Open("/Users/du/Desktop/1.jpg")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	defer file.Close()
-	_, err = io.Copy(part, file)
+	_, err = io.Copy(part, reader)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +49,36 @@ func post(url string, bodyType string, reader io.Reader) (resp *http.Response, e
 		return nil, err
 	}
 
-	req.Header.Set("Content-Type", bodyType)
-	req.Header.Set("Ocp-Apim-Subscription-Key", Config.OcpApimSubscriptionKey)
+	setHeader(req, apiKey)
 	client := &http.Client{}
 	return client.Do(req)
+}
+
+func postURL(url, imageURL string, apiKey string) (resp *http.Response, err error) {
+	req, err := http.NewRequest("POST", url, strings.NewReader(fmt.Sprintf(`{"url":"%v"}`, imageURL)))
+	if err != nil {
+		return nil, err
+	}
+
+	setHeader(req, apiKey)
+
+	client := &http.Client{}
+	return client.Do(req)
+}
+
+func setHeader(request *http.Request, apiKey string) {
+	request.Header.Set("Content-Type", ContentTypeJson)
+	request.Header.Set("Ocp-Apim-Subscription-Key", apiKey)
+}
+
+func convert2String(obj interface{}) string {
+	if obj == nil {
+		return ""
+	}
+
+	if str, ok := obj.(string); ok {
+		return str
+	}
+
+	return ""
 }

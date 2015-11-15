@@ -1,7 +1,8 @@
 package main
+
 import (
-	"github.com/opensdk/go-ms-oxford"
 	"fmt"
+	"github.com/opensdk/go-ms-oxford"
 )
 
 func main() {
@@ -11,9 +12,17 @@ func main() {
 	oxford.Config.AnalyzesHeadPose = true
 	oxford.Config.OcpApimSubscriptionKey = ""
 
+	detection := &oxford.FaceDetection{URL: `http://i3.letvimg.com/lc02_iscms/201511/15/12/59/b378f6b5910c4904af7521a5e35432c8.jpg`}
+	result, err := detection.Detect()
+	if err != nil {
+		panic(err)
+	}
 
+	fmt.Println(result.Success)
+	if result.Success {
+		for _, v := range result.FaceResults {
+			fmt.Println(v.FaceId)
+		}
+	}
 
-
-	detection := &oxford.FaceDetection{}
-	fmt.Println(detection.Detect())
 }

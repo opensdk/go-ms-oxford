@@ -14,7 +14,6 @@ type apiConfig struct {
 	AnalyzesAge            bool
 }
 
-
 var Config apiConfig
 
 func init() {
@@ -28,5 +27,5 @@ func init() {
 }
 
 //ContentType
-const ContentTypeJson  = "application/json"
-const ContentTypeOctetStream  = "application/octet-stram"
+const ContentTypeJson = "application/json"
+const ContentTypeOctetStream = "application/octet-stram"

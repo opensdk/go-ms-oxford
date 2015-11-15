@@ -1,43 +1,122 @@
 package oxford
 
 import (
-	"fmt"
-	"io/ioutil"
+	"encoding/json"
+	"errors"
+	"image"
 	"io"
+	"io/ioutil"
+	"net/http"
+)
+
+// detect result
+type DetectResult struct {
+	ResponseCode int
+	Success      bool
+	Code         string
+	Message      string
+	FaceResults  []FaceResult
+}
+
+// 结果
+type FaceResult struct {
+	FaceId        string
+	FaceRectangle FaceRectangle
+	FaceLandmarks FaceLandmarks
+	Attributes    Attributes
+}
+
+type FaceLandmarks struct {
+	PupilLeft  image.Point
+	PupilRight image.Point
+	NoseTip    image.Point
+}
+
+type FaceRectangle struct {
+	Top    int
+	Left   int
+	Width  int
+	Height int
+}
+
+type Attributes struct {
+	HeadPose HeadPose
+	Gender   string
+	Age      float64
+}
+
+type HeadPose struct {
+	Pitch int
+	Roll  float64
+	Yaw   float64
+}
+
+const (
+	CodeBadArgument      = "BadArgument"      // JSON parsing error.
+	CodeInvalidURL       = "InvalidURL"       // Invalid image URL.
+	CodeInvalidImage     = "InvalidImage"     // Decoding error or unsupported image format.
+	CodeInvalidImageSize = "InvalidImageSize" //Image size is too small (smaller than a detectable face size of 36x36 pixels) or too big (larger than 4MB file limit).
 )
 
 type FaceDetection struct {
-	ContentType string
-	URL         string
-	Reader      io.Reader
+	ContentType            string
+	URL                    string //if set, will use url, otherwise will use Reader
+	Reader                 io.Reader
+	OcpApimSubscriptionKey string //if set, will use this, otherwise will use Config.OcpApimSubscriptionKey
 }
 
-func (self FaceDetection)Detect() error {
+// start to detect a photo
+func (self FaceDetection) Detect() (detectResult DetectResult, err error) {
+	apiKey := Config.OcpApimSubscriptionKey
+	if len(self.OcpApimSubscriptionKey) > 0 {
+		apiKey = self.OcpApimSubscriptionKey
+	}
+	var resp *http.Response
 	if len(self.URL) == 0 {
-//		if nil == self.Reader {
-//			return errors.New("nothing to detect")
-//		}
+		err = errors.New("reader not support yet, please use url")
+		return
+
+		if nil == self.Reader {
+			err = errors.New("no content or url to detect")
+			return
+		}
 
 		self.ContentType = ContentTypeOctetStream
+		resp, err = postFile(Config.detectionsURL, self.Reader, apiKey)
+
 	} else {
 		self.ContentType = ContentTypeJson
-	}
-
-	resp, err := post(Config.detectionsURL, self.ContentType, self.Reader)
-	if err != nil {
-		return err
+		resp, err = postURL(Config.detectionsURL, self.URL, apiKey)
 	}
 
 	defer resp.Body.Close()
-	output, err := ioutil.ReadAll(resp.Body)
+	var respBody []byte
+	respBody, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return
 	}
 
-	fmt.Println(resp.Status)
-	fmt.Println(string(output))
+	detectResult.ResponseCode = resp.StatusCode
 
+	if resp.StatusCode != 200 {
+		var bodyMap map[string]interface{}
+		if err = json.Unmarshal(respBody, &bodyMap); err != nil {
+			return
+		}
 
-	return nil
+		detectResult.Message = convert2String(bodyMap["message"])
+		detectResult.Code = convert2String(bodyMap["message"])
+		return
+	}
+
+	var faceResult []FaceResult
+	if err = json.Unmarshal(respBody, &faceResult); err != nil {
+		return
+	}
+
+	detectResult.Success = true
+	detectResult.Message = "success"
+	detectResult.FaceResults = faceResult
+
+	return
 }
-
