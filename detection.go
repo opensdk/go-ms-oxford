@@ -3,7 +3,6 @@ package oxford
 import (
 	"encoding/json"
 	"errors"
-	"image"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -27,9 +26,9 @@ type FaceResult struct {
 }
 
 type FaceLandmarks struct {
-	PupilLeft  image.Point
-	PupilRight image.Point
-	NoseTip    image.Point
+	PupilLeft  point
+	PupilRight point
+	NoseTip    point
 }
 
 type FaceRectangle struct {
@@ -46,15 +45,16 @@ type Attributes struct {
 }
 
 type HeadPose struct {
-	Pitch int
+	Pitch float64
 	Roll  float64
 	Yaw   float64
 }
 
 const (
-	CodeBadArgument      = "BadArgument"      // JSON parsing error.
-	CodeInvalidURL       = "InvalidURL"       // Invalid image URL.
-	CodeInvalidImage     = "InvalidImage"     // Decoding error or unsupported image format.
+	CodeOK = "Ok"// success
+	CodeBadArgument = "BadArgument"      // JSON parsing error.
+	CodeInvalidURL = "InvalidURL"       // Invalid image URL.
+	CodeInvalidImage = "InvalidImage"     // Decoding error or unsupported image format.
 	CodeInvalidImageSize = "InvalidImageSize" //Image size is too small (smaller than a detectable face size of 36x36 pixels) or too big (larger than 4MB file limit).
 )
 
@@ -116,6 +116,7 @@ func (self FaceDetection) Detect() (detectResult DetectResult, err error) {
 
 	detectResult.Success = true
 	detectResult.Message = "success"
+	detectResult.Code = CodeOK
 	detectResult.FaceResults = faceResult
 
 	return

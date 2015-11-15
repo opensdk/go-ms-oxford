@@ -2,33 +2,15 @@ package oxford
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"strings"
+	"fmt"
 )
 
 func postFile(url string, reader io.Reader, apiKey string) (resp *http.Response, err error) {
 	// TODO not worked
-	if Config.AnalyzesAge {
-		url += "analyzesAge=true"
-	}
-
-	if Config.AnalyzesFaceLandmarks {
-		url += "&analyzesFaceLandmarks=true"
-	}
-
-	if Config.AnalyzesGender {
-		url += "&analyzesGender=true"
-	}
-
-	if Config.AnalyzesHeadPose {
-		url += "&analyzesHeadPose=true"
-	}
-
-	fmt.Println(url)
-
 	var body bytes.Buffer
 	writer := multipart.NewWriter(&body)
 
@@ -44,7 +26,7 @@ func postFile(url string, reader io.Reader, apiKey string) (resp *http.Response,
 
 	writer.Close()
 
-	req, err := http.NewRequest("POST", url, &body)
+	req, err := http.NewRequest("POST", getURL(url), &body)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +37,7 @@ func postFile(url string, reader io.Reader, apiKey string) (resp *http.Response,
 }
 
 func postURL(url, imageURL string, apiKey string) (resp *http.Response, err error) {
-	req, err := http.NewRequest("POST", url, strings.NewReader(fmt.Sprintf(`{"url":"%v"}`, imageURL)))
+	req, err := http.NewRequest("POST", getURL(url), strings.NewReader(fmt.Sprintf(`{"url":"%v"}`, imageURL)))
 	if err != nil {
 		return nil, err
 	}
@@ -81,4 +63,29 @@ func convert2String(obj interface{}) string {
 	}
 
 	return ""
+}
+
+type point struct {
+	X float64
+	Y float64
+}
+
+func getURL(url string) string {
+	if Config.AnalyzesAge {
+		url += "analyzesAge=true"
+	}
+
+	if Config.AnalyzesFaceLandmarks {
+		url += "&analyzesFaceLandmarks=true"
+	}
+
+	if Config.AnalyzesGender {
+		url += "&analyzesGender=true"
+	}
+
+	if Config.AnalyzesHeadPose {
+		url += "&analyzesHeadPose=true"
+	}
+
+	return url
 }
