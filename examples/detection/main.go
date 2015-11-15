@@ -21,7 +21,7 @@ func main() {
 	fmt.Println(result.Success)
 	if result.Success {
 		for _, v := range result.FaceResults {
-			fmt.Println("faceIdL", v.FaceId, "age:", v.Attributes.Age, "gender:", v.Attributes.Gender)
+			fmt.Println("faceIdL", v.FaceId, "age:", v.Attributes.Age, "gender:", v.Attributes.Gender, "NoseRightAlarOutTip:", v.FaceLandmarks.NoseRightAlarOutTip)
 			fmt.Println(v.FaceLandmarks.PupilLeft)
 		}
 	}

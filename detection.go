@@ -17,7 +17,7 @@ type DetectResult struct {
 	FaceResults  []FaceResult
 }
 
-// 结果
+// face detect result
 type FaceResult struct {
 	FaceId        string
 	FaceRectangle FaceRectangle
@@ -26,9 +26,32 @@ type FaceResult struct {
 }
 
 type FaceLandmarks struct {
-	PupilLeft  point
-	PupilRight point
-	NoseTip    point
+	PupilLeft           point
+	PupilRight          point
+	NoseTip             point
+	MouthLeft           point
+	MouthRight          point
+	EyebrowLeftOuter    point
+	EyeLeftOuter        point
+	EyeLeftTop          point
+	EyeLeftBottom       point
+	EyeLeftInner        point
+	EyebrowRightInner   point
+	EyebrowRightOuter   point
+	EyeRightInner       point
+	EyeRightTop         point
+	EyeRightBottom      point
+	EyeRightOuter       point
+	NoseRootLeft        point
+	NoseRootRight       point
+	NoseLeftAlarTop     point
+	NoseRightAlarTop    point
+	NoseLeftAlarOutTip  point
+	NoseRightAlarOutTip point
+	UpperLipTop         point
+	UpperLipBottom      point
+	UnderLipTop         point
+	UnderLipBottom      point
 }
 
 type FaceRectangle struct {
