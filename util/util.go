@@ -7,7 +7,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
@@ -22,15 +21,8 @@ func PostFile(url string, reader io.Reader, apiKey string) (resp *http.Response,
 		return nil, err
 	}
 
-	f, err := os.Open("/Users/du/Desktop/111.png")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	defer f.Close()
 	var size int64
-	size, err = io.Copy(part, f)
+	size, err = io.Copy(part, reader)
 	if err != nil {
 		return
 	}

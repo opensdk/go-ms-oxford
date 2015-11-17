@@ -30,7 +30,7 @@ func main() {
 	}
 
 	{
-		f, err := os.Open("/Users/du/Desktop/111.png")
+		f, err := os.Open("../images/1.jpg")
 		if err != nil {
 			fmt.Println(err)
 			return
