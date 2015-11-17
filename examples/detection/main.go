@@ -46,7 +46,7 @@ func main() {
 		//		buf := bytes.NewBuffer(byteBuf)
 
 		detection := &face.FaceDetection{Reader: f}
-		result, err := detection.Detect()
+		result, err := detection.Do()
 		if err != nil {
 			panic(err)
 		}

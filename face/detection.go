@@ -26,8 +26,6 @@ import (
 
 // detect result
 type DetectResult struct {
-	StatusCode  int
-	Success     bool
 	oxford.Result
 	FaceResults []Face
 }
@@ -103,7 +101,7 @@ type FaceDetection struct {
 }
 
 // start to detect a photo
-func (self FaceDetection) Detect() (detectResult DetectResult, err error) {
+func (self FaceDetection) Do() (detectResult DetectResult, err error) {
 	apiKey := oxford.Config.OcpApimSubscriptionKey
 	if len(self.OcpApimSubscriptionKey) > 0 {
 		apiKey = self.OcpApimSubscriptionKey
@@ -122,17 +120,12 @@ func (self FaceDetection) Detect() (detectResult DetectResult, err error) {
 
 	}
 
+	respBody, err := util.HandleResponse(resp)
 	if err != nil {
 		return
 	}
 
 	defer resp.Body.Close()
-	var respBody []byte
-
-	respBody, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return
-	}
 
 	detectResult.StatusCode = resp.StatusCode
 

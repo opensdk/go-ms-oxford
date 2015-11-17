@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"io/ioutil"
 )
 
 func PostFile(url string, reader io.Reader, apiKey string) (resp *http.Response, err error) {
@@ -55,6 +56,15 @@ func PostURL(url, imageURL string, apiKey string) (resp *http.Response, err erro
 
 	client := &http.Client{}
 	return client.Do(req)
+}
+
+
+func HandleResponse(response *http.Response) (body []byte, err error)  {
+	body, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func Convert2String(obj interface{}) string {

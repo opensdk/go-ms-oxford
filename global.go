@@ -30,6 +30,8 @@ const ContentTypeJson = "application/json"
 const ContentTypeOctetStream = "application/octet-stream"
 
 type Result struct {
-	Code    string
-	Message string
+	StatusCode int
+	Success    bool
+	Code       string
+	Message    string
 }
