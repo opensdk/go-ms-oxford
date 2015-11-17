@@ -26,11 +26,10 @@ import (
 
 // detect result
 type DetectResult struct {
-	ResponseCode int
-	Success      bool
-	Code         string
-	Message      string
-	FaceResults  []Face
+	StatusCode  int
+	Success     bool
+	oxford.Result
+	FaceResults []Face
 }
 
 // face detect result
@@ -90,10 +89,10 @@ type HeadPose struct {
 }
 
 const (
-	CodeOK               = "Ok"               // success
-	CodeBadArgument      = "BadArgument"      // JSON parsing error.
-	CodeInvalidURL       = "InvalidURL"       // Invalid image URL.
-	CodeInvalidImage     = "InvalidImage"     // Decoding error or unsupported image format.
+	CodeOK = "Ok"               // success
+	CodeBadArgument = "BadArgument"      // JSON parsing error.
+	CodeInvalidURL = "InvalidURL"       // Invalid image URL.
+	CodeInvalidImage = "InvalidImage"     // Decoding error or unsupported image format.
 	CodeInvalidImageSize = "InvalidImageSize" //Image size is too small (smaller than a detectable face size of 36x36 pixels) or too big (larger than 4MB file limit).
 )
 
@@ -135,7 +134,7 @@ func (self FaceDetection) Detect() (detectResult DetectResult, err error) {
 		return
 	}
 
-	detectResult.ResponseCode = resp.StatusCode
+	detectResult.StatusCode = resp.StatusCode
 
 	if resp.StatusCode != 200 {
 		var bodyMap map[string]interface{}
