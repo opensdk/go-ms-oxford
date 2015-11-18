@@ -16,8 +16,8 @@ import (
 
 type VerificationResult struct {
 	oxford.Result
-	IsIdentical string
-	Confidence  string
+	IsIdentical bool
+	Confidence  float64
 }
 
 const VerificationRUL = `https://api.projectoxford.ai/face/v0/verifications`
@@ -29,8 +29,23 @@ type FaceVerification struct {
 }
 
 func (self FaceVerification) Do() (result VerificationResult, err error) {
+	apiKey := oxford.Config.OcpApimSubscriptionKey
+	if len(self.OcpApimSubscriptionKey) > 0 {
+		apiKey = self.OcpApimSubscriptionKey
+	}
+
+	req, err := http.NewRequest("POST", VerificationRUL, strings.NewReader(fmt.Sprintf(`{"faceId1":"%v", "faceId2":"%v"}`, self.FaceIdOne, self.FaceIdTwo)))
+	if err != nil {
+		return
+	}
+
+
+	req.Header.Set("Content-Type", oxford.ContentTypeJson)
+	req.Header.Set("Ocp-Apim-Subscription-Key", apiKey)
+
 	var resp *http.Response
-	resp, err = http.Post(VerificationRUL, "application/json", strings.NewReader(fmt.Sprint(`{"faceid1":"%v", "faceid2":"%v"}`, self.FaceIdOne, self.FaceIdTwo)))
+	client := &http.Client{}
+	resp, err = client.Do(req)
 
 	respBody, err := util.HandleResponse(resp)
 	if err != nil {
@@ -50,8 +65,7 @@ func (self FaceVerification) Do() (result VerificationResult, err error) {
 		return
 	}
 
-	var verificationResult VerificationResult
-	if err = json.Unmarshal(respBody, &verificationResult); err != nil {
+	if err = json.Unmarshal(respBody, &result); err != nil {
 		return
 	}
 
