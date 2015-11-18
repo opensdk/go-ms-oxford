@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"github.com/opensdk/go-ms-oxford"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"strings"
 	"time"
-	"io/ioutil"
 )
 
 func PostFile(url string, reader io.Reader, apiKey string) (resp *http.Response, err error) {
@@ -58,8 +58,7 @@ func PostURL(url, imageURL string, apiKey string) (resp *http.Response, err erro
 	return client.Do(req)
 }
 
-
-func HandleResponse(response *http.Response) (body []byte, err error)  {
+func HandleResponse(response *http.Response) (body []byte, err error) {
 	body, err = ioutil.ReadAll(response.Body)
 	if err != nil {
 		return

@@ -86,10 +86,10 @@ type HeadPose struct {
 }
 
 const (
-	CodeOK = "Ok"               // success
-	CodeBadArgument = "BadArgument"      // JSON parsing error.
-	CodeInvalidURL = "InvalidURL"       // Invalid image URL.
-	CodeInvalidImage = "InvalidImage"     // Decoding error or unsupported image format.
+	CodeOK               = "Ok"               // success
+	CodeBadArgument      = "BadArgument"      // JSON parsing error.
+	CodeInvalidURL       = "InvalidURL"       // Invalid image URL.
+	CodeInvalidImage     = "InvalidImage"     // Decoding error or unsupported image format.
 	CodeInvalidImageSize = "InvalidImageSize" //Image size is too small (smaller than a detectable face size of 36x36 pixels) or too big (larger than 4MB file limit).
 )
 
@@ -116,7 +116,10 @@ func (self FaceDetection) Do() (detectResult DetectResult, err error) {
 
 	} else {
 		resp, err = util.PostURL(oxford.Config.DetectionsURL, self.URL, apiKey)
+	}
 
+	if err != nil {
+		return
 	}
 
 	respBody, err := util.HandleResponse(resp)

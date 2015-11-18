@@ -4,13 +4,14 @@
 // Verification works well for frontal and near-frontal faces.
 // For the scenarios that are sensitive to accuracy please use with own judgment.
 package face
+
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/opensdk/go-ms-oxford"
+	"github.com/opensdk/go-ms-oxford/util"
 	"net/http"
 	"strings"
-	"fmt"
-	"github.com/opensdk/go-ms-oxford/util"
-	"encoding/json"
 )
 
 type VerificationResult struct {
