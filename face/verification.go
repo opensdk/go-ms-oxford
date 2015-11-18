@@ -15,7 +15,8 @@ import (
 
 type VerificationResult struct {
 	oxford.Result
-	VerificationResult VerificationResult
+	IsIdentical string
+	Confidence  string
 }
 
 const VerificationRUL = `https://api.projectoxford.ai/face/v0/verifications`
@@ -56,7 +57,6 @@ func (self FaceVerification) Do() (result VerificationResult, err error) {
 	result.Success = true
 	result.Message = "success"
 	result.Code = CodeOK
-	result.VerificationResult = verificationResult
 
 	return
 }

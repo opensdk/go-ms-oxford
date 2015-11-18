@@ -20,7 +20,6 @@ import (
 	"github.com/opensdk/go-ms-oxford"
 	"github.com/opensdk/go-ms-oxford/util"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
