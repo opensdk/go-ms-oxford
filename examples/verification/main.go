@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/opensdk/go-ms-oxford/face"
 	"fmt"
-	"os"
 	"github.com/opensdk/go-ms-oxford"
+	"github.com/opensdk/go-ms-oxford/face"
+	"os"
 )
 
 func main() {

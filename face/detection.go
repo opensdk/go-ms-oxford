@@ -15,12 +15,17 @@
 package face
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/opensdk/go-ms-oxford"
 	"github.com/opensdk/go-ms-oxford/util"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"strings"
+	"time"
 )
 
 // detect result
@@ -112,10 +117,10 @@ func (self FaceDetection) Do() (detectResult DetectResult, err error) {
 			return
 		}
 
-		resp, err = util.PostFile(oxford.Config.DetectionsURL, self.Reader, apiKey)
+		resp, err = postFile(oxford.Config.DetectionsURL, self.Reader, apiKey)
 
 	} else {
-		resp, err = util.PostURL(oxford.Config.DetectionsURL, self.URL, apiKey)
+		resp, err = postURL(oxford.Config.DetectionsURL, self.URL, apiKey)
 	}
 
 	if err != nil {
@@ -153,4 +158,66 @@ func (self FaceDetection) Do() (detectResult DetectResult, err error) {
 	detectResult.FaceResults = faceResult
 
 	return
+}
+
+func postURL(url, imageURL string, apiKey string) (resp *http.Response, err error) {
+	req, err := http.NewRequest("POST", getURL(url), strings.NewReader(fmt.Sprintf(`{"url":"%v"}`, imageURL)))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", oxford.ContentTypeJson)
+	req.Header.Set("Ocp-Apim-Subscription-Key", apiKey)
+
+	client := &http.Client{}
+	return client.Do(req)
+}
+
+func postFile(url string, reader io.Reader, apiKey string) (resp *http.Response, err error) {
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	part, err := writer.CreateFormFile("file", "111.png")
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = io.Copy(part, reader)
+	if err != nil {
+		return
+	}
+
+	if err = writer.Close(); err != nil {
+		return
+	}
+
+	req, err := http.NewRequest("POST", getURL(url), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", oxford.ContentTypeOctetStream)
+	req.Header.Set("Ocp-Apim-Subscription-Key", apiKey)
+	client := &http.Client{Timeout: time.Second * 30}
+	return client.Do(req)
+}
+
+func getURL(url string) string {
+	if oxford.Config.AnalyzesAge {
+		url += "analyzesAge=true"
+	}
+
+	if oxford.Config.AnalyzesFaceLandmarks {
+		url += "&analyzesFaceLandmarks=true"
+	}
+
+	if oxford.Config.AnalyzesGender {
+		url += "&analyzesGender=true"
+	}
+
+	if oxford.Config.AnalyzesHeadPose {
+		url += "&analyzesHeadPose=true"
+	}
+
+	return url
 }

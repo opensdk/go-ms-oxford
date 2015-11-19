@@ -39,7 +39,6 @@ func (self FaceVerification) Do() (result VerificationResult, err error) {
 		return
 	}
 
-
 	req.Header.Set("Content-Type", oxford.ContentTypeJson)
 	req.Header.Set("Ocp-Apim-Subscription-Key", apiKey)
 
